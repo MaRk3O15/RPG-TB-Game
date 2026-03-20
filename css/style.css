@@ -1,0 +1,77 @@
+/* RPG Turn-Based Game — Base Styles */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+  font-family: 'Courier New', monospace;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #e94560;
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #888;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+/* Battle log */
+.log {
+  background: #16213e;
+  border: 1px solid #0f3460;
+  border-radius: 8px;
+  padding: 16px;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+.log div {
+  padding: 2px 0;
+}
+
+.log-header {
+  color: #e94560;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.log-leader {
+  color: #ffd700;
+}
+
+.log-effect {
+  color: #a78bfa;
+}
+
+.log-ability {
+  color: #60a5fa;
+}
+
+.log-miss {
+  color: #666;
+  font-style: italic;
+}
+
+.log-success {
+  color: #4ade80;
+  font-weight: bold;
+}
