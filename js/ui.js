@@ -409,6 +409,43 @@ export class UI {
     cards.forEach((c) => c.classList.remove(className));
   }
 
+  // Trigger animation on a unit card
+  animateUnit(selector, animClass) {
+    const el = document.querySelector(selector);
+    if (!el) return;
+    el.classList.remove(animClass);
+    // Force reflow so the animation restarts even if it was already applied
+    void el.offsetWidth;
+    el.classList.add(animClass);
+    el.addEventListener('animationend', () => el.classList.remove(animClass), { once: true });
+  }
+
+  // Swing animation for the active attacker
+  animateAttacker(unit, game) {
+    const idx = game.team.indexOf(unit);
+    if (idx !== -1) {
+      this.animateUnit(`.hero-card[data-hero="${idx}"]`, 'anim-swing');
+    } else {
+      const eIdx = game.enemies.indexOf(unit);
+      if (eIdx !== -1) {
+        this.animateUnit(`.enemy-card[data-enemy="${eIdx}"]`, 'anim-swing');
+      }
+    }
+  }
+
+  // Shake animation for the unit that took damage
+  animateDamage(unit, game) {
+    const idx = game.team.indexOf(unit);
+    if (idx !== -1) {
+      this.animateUnit(`.hero-card[data-hero="${idx}"]`, 'anim-shake');
+    } else {
+      const eIdx = game.enemies.indexOf(unit);
+      if (eIdx !== -1) {
+        this.animateUnit(`.enemy-card[data-enemy="${eIdx}"]`, 'anim-shake');
+      }
+    }
+  }
+
   scrollLog() {
     const log = document.getElementById('battle-log');
     if (log) log.scrollTop = log.scrollHeight;
@@ -541,6 +578,7 @@ export class UI {
     const icons = {
       Нападник: '⚔️',
       Лікар: '💚',
+      Медик: '💉',
       Танк: '🛡️',
       Підтримка: '✨',
     };

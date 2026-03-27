@@ -772,6 +772,42 @@ h3 {
   border-radius: 3px;
 }
 
+/* ====== BATTLE ANIMATIONS ====== */
+
+/* Swing animation — plays when a unit takes its turn (attacks) */
+@keyframes swing {
+  0% { transform: rotate(0deg); }
+  20% { transform: rotate(12deg); }
+  40% { transform: rotate(-10deg); }
+  60% { transform: rotate(6deg); }
+  80% { transform: rotate(-3deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.anim-swing .unit-icon,
+.anim-swing .unit-name {
+  display: inline-block;
+  animation: swing 0.5s ease-in-out;
+}
+
+/* Shake animation — plays when a unit takes damage */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-6px); }
+  20% { transform: translateX(6px); }
+  30% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  50% { transform: translateX(-3px); }
+  60% { transform: translateX(3px); }
+  70% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+  90% { transform: translateX(-1px); }
+}
+
+.anim-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
 /* ====== RESPONSIVE ====== */
 @media (max-width: 600px) {
   .battlefield {

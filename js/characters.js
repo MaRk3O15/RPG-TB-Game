@@ -14,8 +14,8 @@ export const CHARACTERS = {
     speed: 7,
     abilities: [
       {
-        id: 'rifle_butt',
-        name: 'Удар прикладом',
+        id: 'machete_strike',
+        name: 'Удар мачете',
         description: 'Базова атака по одному ворогу',
         type: 'attack',
         target: 'enemy_single',

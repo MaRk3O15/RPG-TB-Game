@@ -225,6 +225,9 @@ export class Game {
     const ability = hero.useAbility(abilityId);
     if (!ability) return;
 
+    // Animate attacker swing
+    this.ui.animateAttacker(hero, this);
+
     // Process ability
     if (ability.type === 'attack') {
       if (ability.target === 'enemy_single') {
@@ -232,6 +235,7 @@ export class Game {
         if (!target || !target.alive) return;
         const dmg = calculateDamage(hero, target, ability.damageMultiplier);
         const actual = target.takeDamage(dmg);
+        this.ui.animateDamage(target, this);
         this.addLog(`${hero.name} → "${ability.name}" → ${target.name}: ${actual} шкоди`, 'attack');
         if (!target.alive) this.addLog(`${target.name} знищено!`, 'kill');
         const effects = applyAbilityEffects(ability, target, hero);
@@ -244,6 +248,7 @@ export class Game {
           if (!enemy.alive) continue;
           const dmg = calculateDamage(hero, enemy, ability.damageMultiplier);
           const actual = enemy.takeDamage(dmg);
+          this.ui.animateDamage(enemy, this);
           this.addLog(`  → ${enemy.name}: ${actual} шкоди${!enemy.alive ? ' 💀' : ''}`, 'attack');
           const effects = applyAbilityEffects(ability, enemy, hero);
           for (const e of effects) {
@@ -256,6 +261,7 @@ export class Game {
       if (!target || !target.alive) return;
       const dmg = calculateDamage(hero, target, ability.damageMultiplier);
       const actual = target.takeDamage(dmg);
+      this.ui.animateDamage(target, this);
       this.addLog(`${hero.name} → "${ability.name}" → ${target.name}: ${actual} шкоди`, 'attack');
       if (!target.alive) this.addLog(`${target.name} знищено!`, 'kill');
       const aliveAllies = this.team.filter((h) => h.alive && h.hp < h.maxHp);
@@ -361,11 +367,13 @@ export class Game {
       }
 
       if (special.type === 'attack_all' && special.currentCooldown === 0) {
+        this.ui.animateAttacker(enemy, this);
         this.addLog(`${enemy.name} → "${special.name}"!`, 'enemy_special');
         for (const hero of this.team) {
           if (!hero.alive) continue;
           const dmg = calculateDamage(enemy, hero, special.damageMultiplier);
           const actual = this.applyDamageToHero(hero, dmg);
+          this.ui.animateDamage(hero, this);
           this.addLog(`  → ${hero.name}: ${actual} шкоди${!hero.alive ? ' 💀' : ''}`, 'enemy_attack');
         }
         special.currentCooldown = special.cooldown;
@@ -385,8 +393,10 @@ export class Game {
       return;
     }
 
+    this.ui.animateAttacker(enemy, this);
     const dmg = calculateDamage(enemy, target);
     const actual = this.applyDamageToHero(target, dmg);
+    this.ui.animateDamage(target, this);
     this.addLog(`${enemy.name} → ${target.name}: ${actual} шкоди${!target.alive ? ' 💀' : ''}`, 'enemy_attack');
 
     this.endUnitTurn(enemy);
