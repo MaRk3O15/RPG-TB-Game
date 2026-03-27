@@ -481,21 +481,37 @@ h3 {
 .tier-elite .unit-tier { color: #f59e0b; }
 .tier-boss .unit-tier { color: #dc2626; }
 
+.unit-name-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
 .unit-icon {
   display: inline;
-  margin-right: 4px;
 }
 
 .unit-name {
   font-weight: bold;
   font-size: 0.9rem;
-  margin-bottom: 4px;
 }
 
 .unit-class {
   color: #888;
   font-weight: normal;
   font-size: 0.8rem;
+}
+
+.leader-badge {
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+  font-size: 0.65rem;
+  font-weight: bold;
+  padding: 1px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 215, 0, 0.4);
 }
 
 .unit-stats {

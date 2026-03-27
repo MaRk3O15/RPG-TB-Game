@@ -11,6 +11,7 @@ export class Hero extends Unit {
       hp: characterData.hp,
       atk: characterData.atk,
       def: characterData.def,
+      speed: characterData.speed || 10,
       tags: characterData.tags,
     });
 

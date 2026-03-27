@@ -7,6 +7,7 @@ export const ENEMIES = {
     hp: 35,
     atk: 10,
     def: 3,
+    speed: 12,
     tags: ['Гоблін'],
     specialAbility: null,
     passive: null,
@@ -18,6 +19,7 @@ export const ENEMIES = {
     hp: 45,
     atk: 12,
     def: 5,
+    speed: 8,
     tags: ['Нежить'],
     specialAbility: null,
     passive: null,
@@ -29,6 +31,7 @@ export const ENEMIES = {
     hp: 65,
     atk: 16,
     def: 8,
+    speed: 5,
     tags: ['Орк'],
     specialAbility: null,
     passive: null,
@@ -40,6 +43,7 @@ export const ENEMIES = {
     hp: 30,
     atk: 18,
     def: 2,
+    speed: 9,
     tags: ['Маг'],
     specialAbility: null,
     // Ignores 50% of target's DEF
@@ -52,6 +56,7 @@ export const ENEMIES = {
     hp: 65,
     atk: 16,
     def: 12,
+    speed: 7,
     tags: ['Орк', 'Еліта'],
     specialAbility: {
       name: 'Бойовий клич',
@@ -72,6 +77,7 @@ export const ENEMIES = {
     hp: 45,
     atk: 14,
     def: 6,
+    speed: 9,
     tags: ['Нежить', 'Маг', 'Еліта'],
     specialAbility: {
       name: 'Воскресіння нежиті',
@@ -88,6 +94,7 @@ export const ENEMIES = {
     hp: 70,
     atk: 16,
     def: 15,
+    speed: 8,
     tags: ['Дракон', 'Бос'],
     specialAbility: {
       name: 'Вогняне дихання',

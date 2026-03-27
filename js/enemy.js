@@ -19,6 +19,7 @@ export class Enemy extends Unit {
       hp: Math.round(enemyData.hp * mult.hp),
       atk: Math.round(enemyData.atk * mult.atk),
       def: enemyData.def,
+      speed: enemyData.speed || 10,
       tags: enemyData.tags || [],
     });
 

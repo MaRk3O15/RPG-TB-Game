@@ -11,6 +11,7 @@ export const CHARACTERS = {
     hp: 95,
     atk: 22,
     def: 8,
+    speed: 12,
     abilities: [
       {
         id: 'axe_swing',
@@ -97,6 +98,7 @@ export const CHARACTERS = {
     hp: 85,
     atk: 8,
     def: 10,
+    speed: 8,
     abilities: [
       {
         id: 'sacred_touch',
@@ -179,6 +181,7 @@ export const CHARACTERS = {
     hp: 170,
     atk: 12,
     def: 20,
+    speed: 6,
     abilities: [
       {
         id: 'shield_bash',
@@ -270,6 +273,7 @@ export const CHARACTERS = {
     hp: 78,
     atk: 10,
     def: 6,
+    speed: 10,
     abilities: [
       {
         id: 'magic_missile',
@@ -358,6 +362,7 @@ export const CHARACTERS = {
     hp: 88,
     atk: 28,
     def: 5,
+    speed: 14,
     abilities: [
       {
         id: 'mad_strike',

@@ -2,7 +2,7 @@
 // A "unit" is anything that can fight: attack, take damage, or die
 
 export class Unit {
-  constructor({ name, hp, atk, def, tags = [] }) {
+  constructor({ name, hp, atk, def, speed = 10, tags = [] }) {
     this.name = name;
 
     // Stats
@@ -10,6 +10,10 @@ export class Unit {
     this.hp = hp;
     this.baseAtk = atk;
     this.baseDef = def;
+    this.speed = speed;
+
+    // Turn gauge (0-100). When it reaches 100, this unit can act
+    this.turnGauge = 0;
 
     // Tags for synergy system (e.g., "Barbarian", "Leader", "Attacker")
     this.tags = tags;
@@ -176,6 +180,17 @@ export class Unit {
   }
 
   // --- Info ---
+
+  // Get effective speed (affected by debuffs)
+  getSpeed() {
+    let speed = this.speed;
+    for (const effect of this.effects) {
+      if (effect.stat === 'speed') {
+        speed += effect.value;
+      }
+    }
+    return Math.max(1, speed);
+  }
 
   // Get HP as percentage (for HP bars)
   getHpPercent() {

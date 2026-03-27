@@ -34,6 +34,9 @@ export class UI {
   // ====== TEAM SELECT SCREEN ======
   renderTeamSelect(game) {
     const charIds = getAllCharacterIds();
+    // Filter out characters that are already in team slots
+    const selectedIds = game.teamSlots.filter((s) => s !== null);
+    const availableIds = charIds.filter((id) => !selectedIds.includes(id));
 
     let html = `
       <div class="screen team-select-screen">
@@ -67,10 +70,12 @@ export class UI {
 
         <h2>Доступні герої</h2>
         <div class="char-list">
-          ${charIds
-            .map((id) => {
-              const char = CHARACTERS[id];
-              return `
+          ${availableIds.length === 0
+            ? '<p class="hint">Всіх героїв обрано!</p>'
+            : availableIds
+                .map((id) => {
+                  const char = CHARACTERS[id];
+                  return `
               <div class="char-card" data-char="${id}">
                 <div class="char-icon">${this.getClassIcon(char.className)}</div>
                 <div class="char-info">
@@ -80,6 +85,7 @@ export class UI {
                     <span class="stat-hp">❤️ ${char.hp}</span>
                     <span class="stat-atk">⚔️ ${char.atk}</span>
                     <span class="stat-def">🛡️ ${char.def}</span>
+                    <span class="stat-spd">💨 ${char.speed}</span>
                   </div>
                   <div class="char-tags">${char.tags.map((t) => `<span class="tag">${t}</span>`).join('')}</div>
                   <div class="char-abilities">
@@ -90,8 +96,8 @@ export class UI {
                 <button class="btn-add" data-char="${id}">+</button>
               </div>
             `;
-            })
-            .join('')}
+                })
+                .join('')}
         </div>
 
         <button class="btn-primary btn-start ${game.canStartBattle() ? '' : 'disabled'}" id="btn-to-levels">
@@ -107,7 +113,6 @@ export class UI {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const charId = btn.dataset.char;
-        // Find first empty slot
         const emptyIndex = game.teamSlots.indexOf(null);
         if (emptyIndex !== -1) {
           game.setTeamSlot(emptyIndex, charId);
@@ -185,6 +190,15 @@ export class UI {
     const currentHero = game.getCurrentHero();
     this.selectedAbility = null;
 
+    // Collect all units for turn order display
+    const allUnits = [];
+    for (const h of game.team) {
+      if (h.alive) allUnits.push({ unit: h, type: 'hero' });
+    }
+    for (const e of game.enemies) {
+      if (e.alive) allUnits.push({ unit: e, type: 'enemy' });
+    }
+
     let html = `
       <div class="screen battle-screen">
         <div class="battle-header">
@@ -193,21 +207,29 @@ export class UI {
         </div>
 
         <div class="battlefield">
-          <div class="enemies-side">
-            <h3>Вороги</h3>
+          <div class="heroes-side">
+            <h3>Команда</h3>
             <div class="unit-list">
-              ${game.enemies
+              ${game.team
                 .map(
-                  (enemy, i) => `
-                <div class="unit-card enemy-card ${!enemy.alive ? 'dead' : ''} ${enemy.tier !== 'normal' ? 'tier-' + enemy.tier : ''}" data-enemy="${i}">
-                  <div class="unit-tier">${enemy.tier === 'elite' ? '⭐ Еліта' : enemy.tier === 'boss' ? '💀 БОС' : ''}</div>
-                  <div class="unit-name">${enemy.name}</div>
-                  <div class="hp-bar-container">
-                    <div class="hp-bar" style="width: ${enemy.getHpPercent()}%"></div>
-                    <div class="hp-text">${enemy.hp}/${enemy.maxHp}</div>
+                  (hero, i) => `
+                <div class="unit-card hero-card ${!hero.alive ? 'dead' : ''} ${currentHero === hero ? 'active-hero' : ''}" data-hero="${i}">
+                  <div class="unit-name-row">
+                    <span class="unit-icon">${this.getClassIcon(hero.className)}</span>
+                    <span class="unit-name">${hero.name}</span>
+                    <span class="unit-class">${hero.className}</span>
+                    ${hero.isLeader && hero.hasTag('Лідер') ? '<span class="leader-badge">👑 Лідер</span>' : ''}
                   </div>
-                  <div class="unit-stats">⚔️${enemy.getAtk()} 🛡️${enemy.getDef()}</div>
-                  ${this.renderEffects(enemy.effects)}
+                  <div class="hp-bar-container">
+                    <div class="hp-bar hp-bar-hero" style="width: ${hero.getHpPercent()}%"></div>
+                    <div class="hp-text">${hero.hp}/${hero.maxHp}</div>
+                  </div>
+                  <div class="gauge-bar-container">
+                    <div class="gauge-bar ${hero.turnGauge >= 100 ? 'gauge-full' : ''}" style="width: ${Math.min(100, Math.round(hero.turnGauge))}%"></div>
+                    <div class="gauge-text">Хід: ${Math.min(100, Math.round(hero.turnGauge))}%</div>
+                  </div>
+                  <div class="unit-stats">⚔️${hero.getAtk()} 🛡️${hero.getDef()} 💨${hero.getSpeed()}</div>
+                  ${this.renderEffects(hero.effects)}
                 </div>
               `
                 )
@@ -217,21 +239,25 @@ export class UI {
 
           <div class="vs-divider">VS</div>
 
-          <div class="heroes-side">
-            <h3>Команда</h3>
+          <div class="enemies-side">
+            <h3>Вороги</h3>
             <div class="unit-list">
-              ${game.team
+              ${game.enemies
                 .map(
-                  (hero, i) => `
-                <div class="unit-card hero-card ${!hero.alive ? 'dead' : ''} ${currentHero === hero ? 'active-hero' : ''}" data-hero="${i}">
-                  <div class="unit-icon">${this.getClassIcon(hero.className)}</div>
-                  <div class="unit-name">${hero.name} <span class="unit-class">${hero.className}</span></div>
+                  (enemy, i) => `
+                <div class="unit-card enemy-card ${!enemy.alive ? 'dead' : ''} ${enemy.tier !== 'normal' ? 'tier-' + enemy.tier : ''} ${game.activeUnit === enemy ? 'active-enemy' : ''}" data-enemy="${i}">
+                  <div class="unit-tier">${enemy.tier === 'elite' ? '⭐ Еліта' : enemy.tier === 'boss' ? '💀 БОС' : ''}</div>
+                  <div class="unit-name">${enemy.name}</div>
                   <div class="hp-bar-container">
-                    <div class="hp-bar hp-bar-hero" style="width: ${hero.getHpPercent()}%"></div>
-                    <div class="hp-text">${hero.hp}/${hero.maxHp}</div>
+                    <div class="hp-bar" style="width: ${enemy.getHpPercent()}%"></div>
+                    <div class="hp-text">${enemy.hp}/${enemy.maxHp}</div>
                   </div>
-                  <div class="unit-stats">⚔️${hero.getAtk()} 🛡️${hero.getDef()}</div>
-                  ${this.renderEffects(hero.effects)}
+                  <div class="gauge-bar-container">
+                    <div class="gauge-bar gauge-enemy ${enemy.turnGauge >= 100 ? 'gauge-full' : ''}" style="width: ${Math.min(100, Math.round(enemy.turnGauge))}%"></div>
+                    <div class="gauge-text">Хід: ${Math.min(100, Math.round(enemy.turnGauge))}%</div>
+                  </div>
+                  <div class="unit-stats">⚔️${enemy.getAtk()} 🛡️${enemy.getDef()} 💨${enemy.getSpeed()}</div>
+                  ${this.renderEffects(enemy.effects)}
                 </div>
               `
                 )
@@ -240,7 +266,7 @@ export class UI {
           </div>
         </div>
 
-        ${currentHero ? this.renderAbilityPanel(game, currentHero) : ''}
+        ${currentHero ? this.renderAbilityPanel(game, currentHero) : `<div class="ability-panel"><div class="current-hero-label">Хід ворога...</div></div>`}
 
         <div class="battle-log" id="battle-log">
           ${game.battleLog
@@ -252,16 +278,15 @@ export class UI {
 
     this.container.innerHTML = html;
     this.scrollLog();
-    this.attachBattleListeners(game, currentHero);
+    if (currentHero) this.attachBattleListeners(game, currentHero);
   }
 
   renderAbilityPanel(game, hero) {
     const abilities = hero.abilities;
-    const deadAllies = game.team.filter((h) => !h.alive);
 
     return `
       <div class="ability-panel">
-        <div class="current-hero-label">Хід: <strong>${hero.name}</strong></div>
+        <div class="current-hero-label">Хід: <strong>${hero.name}</strong>${hero.isLeader && hero.hasTag('Лідер') ? ' 👑' : ''}</div>
         <div class="ability-list">
           ${abilities
             .map(
@@ -284,7 +309,6 @@ export class UI {
   }
 
   renderEffects(effects) {
-    // Filter out leader passives (duration 999)
     const visible = effects.filter((e) => e.duration < 999);
     if (visible.length === 0) return '';
 
@@ -310,7 +334,6 @@ export class UI {
 
     abilityBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
-        // Deselect previous
         abilityBtns.forEach((b) => b.classList.remove('selected'));
         btn.classList.add('selected');
 
@@ -318,7 +341,6 @@ export class UI {
         const ability = currentHero.abilities.find((a) => a.id === abilityId);
         this.selectedAbility = ability;
 
-        // Show target hint
         if (hint) {
           if (ability.target === 'enemy_single') {
             hint.textContent = '👆 Обери ворога для атаки';
@@ -337,7 +359,6 @@ export class UI {
             const deadCards = this.container.querySelectorAll('.hero-card.dead');
             this.highlightTargets(deadCards, 'targetable');
           } else if (ability.target === 'self') {
-            // Self-target: execute immediately
             hint.textContent = '';
             game.executeAbility(abilityId, 0);
             return;
@@ -346,37 +367,30 @@ export class UI {
       });
     });
 
-    // Click on enemy to attack
     enemyCards.forEach((card) => {
       card.addEventListener('click', () => {
         if (!this.selectedAbility) return;
         if (this.selectedAbility.target !== 'enemy_single' && this.selectedAbility.target !== 'enemy_all') return;
-
         const enemyIndex = parseInt(card.dataset.enemy);
         game.executeAbility(this.selectedAbility.id, enemyIndex);
       });
     });
 
-    // Click on hero for buffs/heals
     heroCards.forEach((card) => {
       card.addEventListener('click', () => {
         if (!this.selectedAbility) return;
         const target = this.selectedAbility.target;
         if (target !== 'ally_single' && target !== 'ally_all') return;
-
         const heroIndex = parseInt(card.dataset.hero);
         game.executeAbility(this.selectedAbility.id, heroIndex);
       });
     });
 
-    // Click on dead hero for revive
     const deadCards = this.container.querySelectorAll('.hero-card.dead');
     deadCards.forEach((card) => {
       card.addEventListener('click', () => {
         if (!this.selectedAbility) return;
         if (this.selectedAbility.target !== 'ally_dead') return;
-
-        // Find index among dead heroes
         const heroIndex = parseInt(card.dataset.hero);
         const deadAllies = game.team.filter((h) => !h.alive);
         const deadIndex = deadAllies.indexOf(game.team[heroIndex]);
