@@ -1,37 +1,38 @@
 // Campaign data — levels, waves, enemy compositions
+// Setting: zombie apocalypse
 
 export const CAMPAIGN = [
   {
     id: 1,
-    name: 'Темний ліс',
-    description: 'Команда вирушає через зачарований ліс, де їх чекають небезпечні створіння.',
+    name: 'Покинуте місто',
+    description: 'Вулиці заповнені зомбі. Потрібно пробитися через руїни міста до безпечної зони.',
     unlocked: true,
     waves: [
-      { enemies: [{ id: 'goblin' }, { id: 'goblin' }] },
-      { enemies: [{ id: 'goblin' }, { id: 'goblin' }, { id: 'skeleton' }] },
-      { enemies: [{ id: 'skeleton' }, { id: 'skeleton' }, { id: 'orc_chief', tier: 'elite' }] },
+      { enemies: [{ id: 'zombie_runner' }, { id: 'zombie_runner' }] },
+      { enemies: [{ id: 'zombie_runner' }, { id: 'zombie_shambler' }, { id: 'zombie_runner' }] },
+      { enemies: [{ id: 'zombie_shambler' }, { id: 'zombie_spitter' }, { id: 'mutant_brute', tier: 'elite' }] },
     ],
   },
   {
     id: 2,
-    name: 'Покинуті катакомби',
-    description: 'Глибоко під землею ховається армія нежиті. Треба пробитися через катакомби.',
+    name: 'Підземна лабораторія',
+    description: 'Секретна лабораторія, де створювали вірус. Тут мутанти набагато небезпечніші.',
     unlocked: false,
     waves: [
-      { enemies: [{ id: 'skeleton' }, { id: 'skeleton' }, { id: 'skeleton' }] },
-      { enemies: [{ id: 'skeleton' }, { id: 'skeleton' }, { id: 'dark_mage' }, { id: 'orc' }] },
-      { enemies: [{ id: 'orc' }, { id: 'dark_mage' }, { id: 'necromancer', tier: 'elite' }] },
+      { enemies: [{ id: 'zombie_shambler' }, { id: 'zombie_shambler' }, { id: 'zombie_spitter' }] },
+      { enemies: [{ id: 'zombie_spitter' }, { id: 'zombie_bloater' }, { id: 'zombie_runner' }, { id: 'zombie_runner' }] },
+      { enemies: [{ id: 'zombie_bloater' }, { id: 'zombie_spitter' }, { id: 'hive_mind', tier: 'elite' }] },
     ],
   },
   {
     id: 3,
-    name: 'Логово Дракона',
-    description: 'Фінальне випробування. Драконолорд Ігніс чекає у серці вулкана.',
+    name: 'Гніздо Альфи',
+    description: 'Фінальне випробування. Зомбі-Альфа контролює всю орду з центру гнізда.',
     unlocked: false,
     waves: [
-      { enemies: [{ id: 'orc' }, { id: 'orc' }, { id: 'dark_mage' }] },
-      { enemies: [{ id: 'dark_mage' }, { id: 'dark_mage' }, { id: 'orc' }, { id: 'orc' }] },
-      { enemies: [{ id: 'skeleton' }, { id: 'dark_mage' }, { id: 'dragon_lord', tier: 'boss' }] },
+      { enemies: [{ id: 'zombie_bloater' }, { id: 'zombie_runner' }, { id: 'zombie_spitter' }] },
+      { enemies: [{ id: 'zombie_spitter' }, { id: 'zombie_spitter' }, { id: 'mutant_brute' }, { id: 'zombie_bloater' }] },
+      { enemies: [{ id: 'zombie_shambler' }, { id: 'hive_mind' }, { id: 'alpha_zombie', tier: 'boss' }] },
     ],
   },
 ];

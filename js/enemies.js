@@ -1,103 +1,110 @@
-// Enemy database — all enemy types with their stats
+// Enemy database — zombies, mutants and abominations
 
 export const ENEMIES = {
-  goblin: {
-    id: 'goblin',
-    name: 'Гоблін',
-    hp: 35,
+  zombie_runner: {
+    id: 'zombie_runner',
+    name: 'Зомбі-бігун',
+    hp: 30,
     atk: 10,
-    def: 3,
-    speed: 12,
-    tags: ['Гоблін'],
+    def: 2,
+    speed: 14,
+    tags: ['Зомбі'],
     specialAbility: null,
     passive: null,
   },
 
-  skeleton: {
-    id: 'skeleton',
-    name: 'Скелет-воїн',
-    hp: 45,
+  zombie_shambler: {
+    id: 'zombie_shambler',
+    name: 'Зомбі-повзун',
+    hp: 50,
     atk: 12,
     def: 5,
-    speed: 8,
-    tags: ['Нежить'],
-    specialAbility: null,
-    passive: null,
-  },
-
-  orc: {
-    id: 'orc',
-    name: 'Орк-громила',
-    hp: 65,
-    atk: 16,
-    def: 8,
     speed: 5,
-    tags: ['Орк'],
+    tags: ['Зомбі'],
     specialAbility: null,
     passive: null,
   },
 
-  dark_mage: {
-    id: 'dark_mage',
-    name: 'Темний маг',
-    hp: 30,
-    atk: 18,
-    def: 2,
+  zombie_spitter: {
+    id: 'zombie_spitter',
+    name: 'Зомбі-плювач',
+    hp: 35,
+    atk: 16,
+    def: 3,
     speed: 9,
-    tags: ['Маг'],
+    tags: ['Зомбі', 'Мутант'],
     specialAbility: null,
-    // Ignores 50% of target's DEF
-    passive: { name: 'Магічна атака', stat: 'defIgnore', value: 0.5 },
+    // Ignores 50% of target's DEF (acid spit)
+    passive: { name: 'Кислотний плювок', stat: 'defIgnore', value: 0.5 },
   },
 
-  orc_chief: {
-    id: 'orc_chief',
-    name: 'Орк-вождь',
-    hp: 65,
-    atk: 16,
-    def: 12,
-    speed: 7,
-    tags: ['Орк', 'Еліта'],
+  zombie_bloater: {
+    id: 'zombie_bloater',
+    name: 'Зомбі-товстун',
+    hp: 70,
+    atk: 8,
+    def: 10,
+    speed: 4,
+    tags: ['Зомбі'],
     specialAbility: {
-      name: 'Бойовий клич',
+      name: 'Токсичний вибух',
+      description: 'АоЕ атака по всій команді (60% від ATK)',
+      type: 'attack_all',
+      damageMultiplier: 0.6,
+      cooldown: 4,
+      currentCooldown: 0,
+    },
+    passive: null,
+  },
+
+  mutant_brute: {
+    id: 'mutant_brute',
+    name: 'Мутант-танк',
+    hp: 80,
+    atk: 18,
+    def: 12,
+    speed: 6,
+    tags: ['Мутант', 'Еліта'],
+    specialAbility: {
+      name: 'Лють орди',
       description: '+20% ATK всім ворогам на 2 ходи',
       type: 'buff_allies',
       cooldown: 4,
       currentCooldown: 0,
       effects: [
-        { name: 'Бойовий клич', type: 'buff', stat: 'atk', value: 0.2, duration: 2 },
+        { name: 'Лють орди', type: 'buff', stat: 'atk', value: 0.2, duration: 2 },
       ],
     },
     passive: null,
   },
 
-  necromancer: {
-    id: 'necromancer',
-    name: 'Некромант',
-    hp: 45,
+  hive_mind: {
+    id: 'hive_mind',
+    name: 'Контролер',
+    hp: 50,
     atk: 14,
     def: 6,
-    speed: 9,
-    tags: ['Нежить', 'Маг', 'Еліта'],
+    speed: 10,
+    tags: ['Мутант', 'Еліта'],
     specialAbility: {
-      name: 'Воскресіння нежиті',
-      description: 'Воскрешає одного полеглого ворога (раз за бій)',
+      name: 'Пробудження мертвих',
+      description: 'Воскрешає одного полеглого зомбі (раз за бій)',
       type: 'revive_ally',
       oncePerBattle: true,
     },
     passive: null,
   },
 
-  dragon_lord: {
-    id: 'dragon_lord',
-    name: 'Драконолорд Ігніс',
-    hp: 70,
-    atk: 16,
+  alpha_zombie: {
+    id: 'alpha_zombie',
+    name: 'Зомбі-Альфа',
+    hp: 90,
+    atk: 20,
     def: 15,
     speed: 8,
-    tags: ['Дракон', 'Бос'],
+    tags: ['Мутант', 'Бос'],
     specialAbility: {
-      name: 'Вогняне дихання',
+      name: 'Смертельний ривок',
       description: 'АоЕ атака по всій команді (70% від ATK)',
       type: 'attack_all',
       damageMultiplier: 0.7,
@@ -105,7 +112,7 @@ export const ENEMIES = {
       currentCooldown: 0,
     },
     // Passively reduces incoming damage by 15%
-    passive: { name: 'Чешуя дракона', stat: 'damageReduction', value: 0.15 },
+    passive: { name: 'Мутована шкіра', stat: 'damageReduction', value: 0.15 },
   },
 };
 
