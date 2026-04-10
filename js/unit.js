@@ -181,6 +181,11 @@ export class Unit {
 
   // --- Info ---
 
+  // Check if this unit is stunned (skips their turn)
+  isStunned() {
+    return this.effects.some((e) => e.stat === 'stun');
+  }
+
   // Get effective speed (affected by debuffs)
   getSpeed() {
     let speed = this.speed;

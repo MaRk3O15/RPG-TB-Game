@@ -192,6 +192,13 @@ export class Game {
 
     this.activeUnit = readyUnit;
 
+    // Skip stunned units
+    if (readyUnit && readyUnit.isStunned()) {
+      this.addLog(`${readyUnit.name} оглушений — пропускає хід!`, 'debuff');
+      this.endUnitTurn(readyUnit);
+      return;
+    }
+
     if (readyUnit instanceof Hero) {
       // Player's turn — wait for input
       this.waitingForPlayer = true;

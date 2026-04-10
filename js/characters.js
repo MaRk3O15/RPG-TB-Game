@@ -324,12 +324,21 @@ export const CHARACTERS = {
       {
         id: 'taser',
         name: 'Електрошокер',
-        description: 'Базова атака по одному ворогу',
+        description: 'Базова атака по одному ворогу. 30% шанс оглушити на 1 хід',
         type: 'attack',
         target: 'enemy_single',
         damageMultiplier: 1.0,
         cooldown: 0,
-        effects: [],
+        effects: [
+          {
+            name: 'Оглушення',
+            type: 'debuff',
+            stat: 'stun',
+            value: 1,
+            duration: 1,
+            chance: 0.30,
+          },
+        ],
       },
       {
         id: 'stim_pack',
