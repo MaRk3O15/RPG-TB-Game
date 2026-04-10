@@ -111,6 +111,7 @@ export const CHARACTERS = {
         description: 'Слабка атака + лікує союзника з найнижчим HP на 10',
         type: 'attack_heal',
         target: 'enemy_single',
+        ranged: true,
         damageMultiplier: 1.0,
         healAmount: 10,
         healTarget: 'ally_lowest_hp',
@@ -194,6 +195,7 @@ export const CHARACTERS = {
         description: 'Точний постріл по одному ворогу',
         type: 'attack',
         target: 'enemy_single',
+        ranged: true,
         damageMultiplier: 1.0,
         cooldown: 0,
         effects: [],
@@ -204,6 +206,7 @@ export const CHARACTERS = {
         description: 'Потужний постріл x1.8 шкоди по одному ворогу',
         type: 'attack',
         target: 'enemy_single',
+        ranged: true,
         damageMultiplier: 1.8,
         cooldown: 3,
         effects: [],
@@ -214,6 +217,7 @@ export const CHARACTERS = {
         description: 'Атака + отрута на 3 ходи (8 шкоди/хід)',
         type: 'attack',
         target: 'enemy_single',
+        ranged: true,
         damageMultiplier: 0.8,
         cooldown: 3,
         effects: [
@@ -248,6 +252,7 @@ export const CHARACTERS = {
         description: 'Базова атака по одному ворогу. 15% шанс сповільнити',
         type: 'attack',
         target: 'enemy_single',
+        ranged: true,
         damageMultiplier: 1.0,
         cooldown: 0,
         effects: [
@@ -267,6 +272,7 @@ export const CHARACTERS = {
         description: 'Атака по ВСІХ ворогах + шкода понаднормово 2 ходи',
         type: 'attack',
         target: 'enemy_all',
+        ranged: true,
         damageMultiplier: 0.7,
         cooldown: 4,
         effects: [

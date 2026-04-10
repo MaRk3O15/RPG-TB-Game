@@ -119,6 +119,65 @@ export const ENEMIES = {
     // Passively reduces incoming damage by 15%
     passive: { name: 'Мутована шкіра', stat: 'damageReduction', value: 0.15 },
   },
+
+  armored_zombie: {
+    id: 'armored_zombie',
+    name: 'Броньований Зомбі',
+    hp: 130,
+    atk: 13,
+    def: 22,
+    speed: 3,
+    tags: ['Зомбі', 'Броньований'],
+    specialAbility: null,
+    // Takes 50% less damage from ranged attacks
+    passive: { name: 'Бронеплити', stat: 'rangedDamageReduction', value: 0.5 },
+  },
+
+  assimilated_officer: {
+    id: 'assimilated_officer',
+    name: 'Асимільований Офіцер',
+    hp: 70,
+    atk: 15,
+    def: 10,
+    speed: 9,
+    tags: ['Асимільований', 'Офіцер', 'Еліта'],
+    specialAbility: {
+      name: 'Командування',
+      description: 'Зомбі: +2 швидкості та +20% крит на 2 ходи. Морпіхи: -20% вхідної шкоди та 10 HP регенерації/хід на 3 ходи',
+      type: 'buff_faction',
+      cooldown: 3,
+      currentCooldown: 0,
+      zombieEffects: [
+        { name: 'Прискорення', type: 'buff', stat: 'speed', value: 2, duration: 2 },
+        { name: 'Бойовий крит', type: 'buff', stat: 'crit', value: 0.2, duration: 2 },
+      ],
+      marineEffects: [
+        { name: 'Захисний бриф', type: 'buff', stat: 'damageReduction', value: 0.2, duration: 2 },
+        { name: 'Регенерація', type: 'buff', stat: 'regen', value: 10, duration: 3 },
+      ],
+    },
+    // When attacked, 1-2 random alive Assimilated Marines counterattack the attacker
+    passive: { name: 'Захист Орди', stat: 'counterattack_marines', marineTag: 'Морпіх' },
+  },
+
+  assimilated_marine: {
+    id: 'assimilated_marine',
+    name: 'Асимільований Морпіх',
+    hp: 100,
+    atk: 24,
+    def: 16,
+    speed: 10,
+    tags: ['Асимільований', 'Морпіх', 'Еліта'],
+    specialAbility: {
+      name: 'Масивний удар',
+      description: 'Нищівний удар — x1.7 шкоди по одній цілі',
+      type: 'attack_single',
+      damageMultiplier: 1.7,
+      cooldown: 3,
+      currentCooldown: 0,
+    },
+    passive: null,
+  },
 };
 
 // Get enemy data by ID (returns a copy to avoid mutation)

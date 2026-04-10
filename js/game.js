@@ -243,37 +243,42 @@ export class Game {
       if (ability.target === 'enemy_single') {
         const target = this.enemies[targetIndex];
         if (!target || !target.alive) return;
-        const dmg = calculateDamage(hero, target, ability.damageMultiplier);
+        const dmg = calculateDamage(hero, target, ability.damageMultiplier, ability);
         const actual = target.takeDamage(dmg);
         this.pendingAnimations.push({ type: 'shake', unit: target });
-        this.addLog(`${hero.name} → "${ability.name}" → ${target.name}: ${actual} шкоди`, 'attack');
+        const critNote = ability.ranged && target.passive?.stat === 'rangedDamageReduction' ? ' [броня -50%]' : '';
+        this.addLog(`${hero.name} → "${ability.name}" → ${target.name}: ${actual} шкоди${critNote}`, 'attack');
         if (!target.alive) this.addLog(`${target.name} знищено!`, 'kill');
         const effects = applyAbilityEffects(ability, target, hero);
         for (const e of effects) {
           this.addLog(`  ↳ ${target.name} отримує "${e.name}" (${e.duration} ходів)`, 'debuff');
         }
+        this.triggerMarineCounterattack(target, hero);
       } else if (ability.target === 'enemy_all') {
         this.addLog(`${hero.name} → "${ability.name}" → ВСІ вороги!`, 'attack');
         for (const enemy of this.enemies) {
           if (!enemy.alive) continue;
-          const dmg = calculateDamage(hero, enemy, ability.damageMultiplier);
+          const dmg = calculateDamage(hero, enemy, ability.damageMultiplier, ability);
           const actual = enemy.takeDamage(dmg);
           this.pendingAnimations.push({ type: 'shake', unit: enemy });
-          this.addLog(`  → ${enemy.name}: ${actual} шкоди${!enemy.alive ? ' 💀' : ''}`, 'attack');
+          const armorNote = ability.ranged && enemy.passive?.stat === 'rangedDamageReduction' ? ' [броня]' : '';
+          this.addLog(`  → ${enemy.name}: ${actual} шкоди${armorNote}${!enemy.alive ? ' 💀' : ''}`, 'attack');
           const effects = applyAbilityEffects(ability, enemy, hero);
           for (const e of effects) {
             this.addLog(`  ↳ ${enemy.name}: "${e.name}" (${e.duration} ходів)`, 'debuff');
           }
+          this.triggerMarineCounterattack(enemy, hero);
         }
       }
     } else if (ability.type === 'attack_heal') {
       const target = this.enemies[targetIndex];
       if (!target || !target.alive) return;
-      const dmg = calculateDamage(hero, target, ability.damageMultiplier);
+      const dmg = calculateDamage(hero, target, ability.damageMultiplier, ability);
       const actual = target.takeDamage(dmg);
       this.pendingAnimations.push({ type: 'shake', unit: target });
       this.addLog(`${hero.name} → "${ability.name}" → ${target.name}: ${actual} шкоди`, 'attack');
       if (!target.alive) this.addLog(`${target.name} знищено!`, 'kill');
+      this.triggerMarineCounterattack(target, hero);
       const aliveAllies = this.team.filter((h) => h.alive && h.hp < h.maxHp);
       if (aliveAllies.length > 0) {
         aliveAllies.sort((a, b) => a.getHpPercent() - b.getHpPercent());
@@ -335,7 +340,7 @@ export class Game {
       return;
     }
 
-    // Process DoT
+    // Process DoT (poison, bleed)
     const dotDmg = enemy.processDoTEffects();
     if (dotDmg > 0) {
       this.addLog(`${enemy.name} отримує ${dotDmg} шкоди від ефектів`, 'dot');
@@ -344,6 +349,12 @@ export class Game {
         this.afterAction();
         return;
       }
+    }
+
+    // Process regen
+    const regenHp = enemy.processRegenEffects();
+    if (regenHp > 0) {
+      this.addLog(`${enemy.name} відновлює ${regenHp} HP (регенерація)`, 'heal');
     }
 
     // Try special ability
@@ -408,6 +419,45 @@ export class Game {
         return;
       }
 
+      if (special.type === 'buff_faction' && special.currentCooldown === 0) {
+        this.addLog(`${enemy.name} → "${special.name}"!`, 'enemy_special');
+        for (const ally of this.enemies) {
+          if (!ally.alive || ally === enemy) continue;
+          // Buff zombies: speed + crit
+          if (ally.hasTag('Зомбі')) {
+            for (const effectData of special.zombieEffects) {
+              ally.addEffect({ ...effectData, source: enemy.name });
+            }
+            this.addLog(`  → ${ally.name}: +швидкість та крит (2 ходи)`, 'buff');
+          }
+          // Buff assimilated marines: defense + regen
+          if (ally.hasTag('Морпіх')) {
+            for (const effectData of special.marineEffects) {
+              ally.addEffect({ ...effectData, source: enemy.name });
+            }
+            this.addLog(`  → ${ally.name}: захист та регенерація (3 ходи)`, 'buff');
+          }
+        }
+        special.currentCooldown = special.cooldown;
+        this.endUnitTurn(enemy);
+        return;
+      }
+
+      if (special.type === 'attack_single' && special.currentCooldown === 0) {
+        const target = enemy.chooseTarget(this.team);
+        if (target) {
+          this.pendingAnimations.push({ type: 'swing', unit: enemy });
+          this.addLog(`${enemy.name} → "${special.name}"!`, 'enemy_special');
+          const dmg = calculateDamage(enemy, target, special.damageMultiplier);
+          const actual = this.applyDamageToHero(target, dmg);
+          this.pendingAnimations.push({ type: 'shake', unit: target });
+          this.addLog(`  → ${target.name}: ${actual} шкоди${!target.alive ? ' 💀' : ''}`, 'enemy_attack');
+        }
+        special.currentCooldown = special.cooldown;
+        this.endUnitTurn(enemy);
+        return;
+      }
+
       if (special.type === 'attack_all' && special.currentCooldown === 0) {
         this.pendingAnimations.push({ type: 'swing', unit: enemy });
         this.addLog(`${enemy.name} → "${special.name}"!`, 'enemy_special');
@@ -442,6 +492,29 @@ export class Game {
     this.addLog(`${enemy.name} → ${target.name}: ${actual} шкоди${!target.alive ? ' 💀' : ''}`, 'enemy_attack');
 
     this.endUnitTurn(enemy);
+  }
+
+  // Trigger marine counterattack when an enemy with counterattack_marines passive is hit
+  triggerMarineCounterattack(attackedEnemy, attacker) {
+    if (!attackedEnemy.alive) return; // already dead, no counterattack
+    if (!attackedEnemy.passive || attackedEnemy.passive.stat !== 'counterattack_marines') return;
+
+    const marineTag = attackedEnemy.passive.marineTag;
+    const marines = this.enemies.filter((e) => e.alive && e !== attackedEnemy && e.hasTag(marineTag));
+    if (marines.length === 0) return;
+
+    // Pick 1 or 2 random marines
+    const count = Math.min(marines.length, Math.floor(Math.random() * 2) + 1);
+    const shuffled = marines.sort(() => Math.random() - 0.5).slice(0, count);
+
+    this.addLog(`  ↳ "${attackedEnemy.passive.name}": морпіхи захищають командира!`, 'enemy_special');
+    for (const marine of shuffled) {
+      if (!attacker.alive) break;
+      const dmg = calculateDamage(marine, attacker);
+      const actual = this.applyDamageToHero(attacker, dmg);
+      this.pendingAnimations.push({ type: 'shake', unit: attacker });
+      this.addLog(`  ↳ ${marine.name} контратакує ${attacker.name}: ${actual} шкоди${!attacker.alive ? ' 💀' : ''}`, 'enemy_attack');
+    }
   }
 
   applyDamageToHero(hero, dmg) {

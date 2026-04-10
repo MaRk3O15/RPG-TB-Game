@@ -172,6 +172,33 @@ export class Unit {
     return totalDamage;
   }
 
+  // Process regeneration effects — returns total HP restored
+  processRegenEffects() {
+    let totalHealed = 0;
+
+    for (const effect of this.effects) {
+      if (effect.stat === 'regen') {
+        const healed = this.heal(effect.value);
+        totalHealed += healed;
+      }
+    }
+
+    return totalHealed;
+  }
+
+  // Get total crit chance from buff effects (0.0 – 1.0)
+  getCritChance() {
+    let crit = 0;
+
+    for (const effect of this.effects) {
+      if (effect.stat === 'crit') {
+        crit += effect.value;
+      }
+    }
+
+    return Math.min(crit, 1.0);
+  }
+
   // --- Tags ---
 
   // Check if this unit has a specific tag
