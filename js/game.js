@@ -8,6 +8,7 @@ import { CHARACTERS } from './characters.js';
 import { getEnemyData } from './enemies.js';
 import { CAMPAIGN } from './campaign.js';
 import { calculateDamage, applyAbilityEffects, applySelfEffects } from './combat.js';
+import { saveProgress, getCurrentUser } from './api.js';
 
 export class Game {
   constructor(ui) {
@@ -600,6 +601,8 @@ export class Game {
     if (this.currentLevel.id > completed) {
       this.progress.levelsCompleted = this.currentLevel.id;
       localStorage.setItem('rpg_progress', JSON.stringify(this.progress));
+      // Save to database
+      saveProgress(this.progress);
     }
 
     this.ui.render(this);
