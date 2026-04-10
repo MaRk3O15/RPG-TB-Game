@@ -279,6 +279,20 @@ export class UI {
     this.container.innerHTML = html;
     this.scrollLog();
     if (currentHero) this.attachBattleListeners(game, currentHero);
+
+    // Apply pending animations after DOM is ready
+    if (game.pendingAnimations && game.pendingAnimations.length > 0) {
+      requestAnimationFrame(() => {
+        for (const anim of game.pendingAnimations) {
+          if (anim.type === 'swing') {
+            this.animateAttacker(anim.unit, game);
+          } else if (anim.type === 'shake') {
+            this.animateDamage(anim.unit, game);
+          }
+        }
+        game.pendingAnimations = [];
+      });
+    }
   }
 
   renderAbilityPanel(game, hero) {
